@@ -11,32 +11,11 @@ confidenceInterval(boot.sol, alpha = 0.05)
 
 \item{alpha}{Level of confidence : 1 - \eqn{\alpha}}
 }
+\value{
+Array with 3 dimensions and size \eqn{Q(Q+1)/2\times 3\times K} (if undirected) or \eqn{Q^2\times 3\times K} (when undirected)
+containing for each pair of groups \eqn{(q,l)} (first dimension) and each \eqn{k}-th subinterval (third dimension) the 3 quantiles at levels \eqn{(\alpha/2,1-\alpha/2,.5)} (second dimension).
+}
 \description{
 Compute confidence bands for all pair of groups \eqn{(q,l)}
 }
-\examples{
-
-# data of a synthetic graph with 50 individuals and 3 clusters
-
-n <- 50
-Q <- 3
-
-Time <- generated_Q3$data$Time
-data <- generated_Q3$data
-z <- generated_Q3$z
-
-Dmax <- 2^3
-
-# VEM-algo hist
-sol.hist <- mainVEM(list(Nijk=statistics(data,n,Dmax,directed=FALSE),Time=Time),
-     n,Qmin=3,directed=FALSE,method='hist',d_part=1,n_perturb=0)[[1]]
-
-# compute bootstrap confidence bands
-boot <- bootstrap_and_CI(sol.hist,Time,R=5,alpha=0.1,nbcores=1,d_part=1,n_perturb=0,
-     directed=FALSE)
-
-boot.sol <- boot$boot.sol
-
-confidenceInterval(boot.sol)
-
-}
+\keyword{internal}

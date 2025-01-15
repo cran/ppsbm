@@ -28,3 +28,4 @@ JEvalMstep(VE, mstep, data, directed, sparse, method = "hist")
 \description{
 Evaluation of the criterion J to verify the convergence of the VEM algorithm
 }
+\keyword{internal}

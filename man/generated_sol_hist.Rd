@@ -3,15 +3,35 @@
 \docType{data}
 \name{generated_sol_hist}
 \alias{generated_sol_hist}
-\title{Generated solution with histogram method}
-\format{List of 5 iterations of the algorithm, each one containing
+\title{Output example of \link[ppsbm]{mainVEM}}
+\format{
+List of 5 components. 
+Each one is the output of the algorithm with a different value of the number of clusters \eqn{Q} for \eqn{1\le Q \le 5} and given as a list of 8 components:  
 \describe{
-  \item{List of 8}{tau, rho, beta, logintensities.ql, best.d, J, run, converged}
-}}
+ \item{\code{tau}}{Matrix with size \eqn{Q\times n} containing the estimated probability in \eqn{(0,1)} that cluster \eqn{q} contains node \eqn{i}.}
+ \item{\code{rho}}{Sparsity parameter - 1 in this case (non sparse method).}
+ \item{\code{beta}}{Sparsity parameter - 1 in this case (non sparse method).}   
+ \item{\code{logintensities.ql}}{Matrix with size \eqn{Q(Q+1)/2\times K}. Each row contains estimated values of the log of the intensity function \eqn{\log(\alpha^{(q,l)})} on a regular partition (in \eqn{K} parts) of the time interval [0,Time].}  
+ \item{\code{best.d}}{Vector with length \eqn{Q(Q+1)/2} (undirected case) with estimated value for the exponent of the best partition to estimate intensity \eqn{\alpha^{(q,l)}}. The best number of parts is \eqn{K=2^d}.}
+ \item{\code{J}}{Estimated value of the ELBO}
+ \item{\code{run}}{Which run of the algorithm gave the best solution. A run relies on a specific initialization of the algorithm. A negative value maybe obtained in the decreasing phase (for Q) of the algorithm.}  
+ \item{\code{converged}}{Boolean. If TRUE, the algorithm stopped at convergence. Otherwise it stopped at the maximal number of iterations.} 
+}
+}
 \usage{
 generated_sol_hist
 }
 \description{
-Generated solution with histogram method
+Output of \link[ppsbm]{mainVEM} obtained on dataset \code{generated_Q3} with \code{hist} method and Qmin=1, Qmax=5.
+}
+\details{
+This solution was (randomly) obtained using the following code
+\preformatted{
+Nijk <- statistics(generated_Q3$data,n=50,K=8,directed=FALSE)
+generated_sol_hist <- mainVEM(list(Nijk=Nijk,Time=1),n=50,Qmin=1,Qmax=5,directed=FALSE,method='hist')
+}
+}
+\references{
+MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 }
 \keyword{datasets}

@@ -7,7 +7,7 @@
 listNodePairs(n, directed = TRUE)
 }
 \arguments{
-\item{n}{Total number of nodes}
+\item{n}{Total number of nodes,  \eqn{1 \le i \le n}}
 
 \item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case}
 }

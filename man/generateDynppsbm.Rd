@@ -2,26 +2,32 @@
 % Please edit documentation in R/generator.R
 \name{generateDynppsbm}
 \alias{generateDynppsbm}
-\title{Data under dynppsbm}
+\title{Dynppsbm data generator}
 \usage{
 generateDynppsbm(intens, Time, n, prop.groups, directed = TRUE)
 }
 \arguments{
-\item{intens}{List containing intensity functions \eqn{\alpha^{(q,l)}} and upper bounds of intensities}
+\item{intens}{List of intensity functions \eqn{\alpha^{(q,l)}}, each one is a list of 2 components:
+\itemize{
+  \item \code{intens} : a positive function. The intensity function  \eqn{\alpha^{(q,l)}}
+  \item \code{max} : positive real number. An upper bound on \eqn{\alpha^{(q,l)}}
+}}
 
-\item{Time}{Final time}
+\item{Time}{Positive real number. [0,Time] is the total time interval of observation.}
 
-\item{n}{Total number of nodes}
+\item{n}{Total number of nodes,  \eqn{1\le i \le n}.}
 
 \item{prop.groups}{Vector of group proportions (probability to belong to a group), should be of length \eqn{Q}}
 
-\item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case. If directed=TRUE then intens should be of length \eqn{Q^2} and if directed =FALSE then length \eqn{Q*(Q+1)/2}}
+\item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case.
+
+If directed then \code{intens} should be of length \eqn{Q^2}, else of length \eqn{Q*(Q+1)/2}.}
 }
 \value{
-Simulated data, latent group variables and intensities \eqn{\alpha^{(q,l)}}
+Simulated data, latent group variables and intensities \eqn{\alpha^{(q,l)}}.
 }
 \description{
-Generate data under dynppsbm
+Generates data under the Dynamic Poisson Process Stochastic Blockmodel (dynppsbm).
 }
 \examples{
 # Generate data from an undirected graph with n=10 individuals and Q=2 clusters
@@ -29,7 +35,7 @@ Generate data under dynppsbm
 # equal cluster proportions
 prop.groups <- c(0.5,0.5)
 
-# 3 different intensity functions :
+# 3 different intensity functions:
 intens <- list(NULL)
 intens[[1]] <- list(intens= function(x) 100*x*exp(-8*x),max=5)
     # (q,l) = (1,1)
@@ -38,13 +44,13 @@ intens[[2]] <- list(intens= function(x) exp(3*x)*(sin(6*pi*x-pi/2)+1)/2,max=13)
 intens[[3]] <- list(intens= function(x) 8.1*(exp(-6*abs(x-1/2))-.049),max=8)
     # (q,l) = (2,2)
 
-# generate data :
+# generate data:
 obs <- generateDynppsbm(intens,Time=1,n=10,prop.groups,directed=FALSE)
 
 # latent variables (true clustering of the individuals)
 obs$z
 
-# number of time events :
+# number of time events:
 length(obs$data$time.seq)
 
 # number of interactions between each pair of individuals:
@@ -52,11 +58,5 @@ table(obs$data$type.seq)
 
 }
 \references{
-ANDERSEN, P. K., BORGAN, Ø., GILL, R. D. & KEIDING, N. (1993). Statistical models based on counting processes. Springer Series in Statistics. Springer-Verlag, New York.
-
-DAUDIN, J.-J., PICARD, F. & ROBIN, S. (2008). A mixture model for random graphs. Statist. Comput. 18, 173–183.
-
-MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
-
-MATIAS, C. & ROBIN, S. (2014). Modeling heterogeneity in random graphs through latent space models: a selective review. Esaim Proc. & Surveys 47, 55–74.
+MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 }

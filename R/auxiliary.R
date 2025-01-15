@@ -10,7 +10,10 @@
 
 #' Convert node pair \eqn{(i,j)}
 #'
-#' Convert node pair \eqn{(i,j)} into an index
+#' Convert node pair \eqn{(i,j)} into an index in \eqn{\{1,\dots,N\}} where \eqn{N=n(n-1)} (directed case) or \eqn{N=n(n-1)/2} (undirected case).
+#' 
+#' Interacting individuals \eqn{(i,j)} must be encoded into integer values in  \eqn{\{1,\dots,N\}} in describing the data. 
+#'  
 #' \describe{
 #'   \item{\strong{Directed case :}}{
 #'     \itemize{
@@ -29,11 +32,11 @@
 #'       \item \eqn{N = n*(n-1)} for the directed case
 #'       \item \eqn{N = n*(n-1)/2}  for the undirected case
 #'     }
-#' which corresponds to the cardinality of data$type.seq
+#' which corresponds to the range of values for \code{data$type.seq}
 #'
-#' @param i Node \eqn{i} : \eqn{i\in {1, \ldots, n} }
-#' @param j Node \eqn{j} : \eqn{j\in {1, \ldots, n} }
-#' @param n Total number of nodes : \eqn{i,j\in {1, \ldots, n} }
+#' @param i Node \eqn{i} : \eqn{i\in \{1, \ldots, n\} }
+#' @param j Node \eqn{j} : \eqn{j\in \{1, \ldots, n\} }
+#' @param n Total number of nodes,  \eqn{1\le i \le n}
 #' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
 #'
 #' @return Index corresponding to the node pair
@@ -42,7 +45,7 @@
 #'
 #' @examples
 #' # Convert the node pair (3,7) into an index, where the total number of nodes is 10,
-#' # for directed and undirected graph
+#' # for directed and undirected interactions
 #'
 #' i <- 3
 #' j <- 7
@@ -68,7 +71,7 @@ convertNodePair <- function(i,j,n,directed){
 #'
 #' Create the list of all node pairs
 #'
-#' @param n Total number of nodes
+#' @param n Total number of nodes,  \eqn{1 \le i \le n}
 #' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
 #'
 #' @return Matrix with two columns which lists all the possible node pairs. Each row is a node pair.
@@ -109,18 +112,18 @@ listNodePairs <- function(n,directed=TRUE){
 
 #' Convert group pair \eqn{(q,l)}
 #'
-#' Gives the index in \eqn{1, \ldots, Q^2} (directed) or \eqn{1, \ldots, Q*(Q+1)/2} (undirected) that corresponds to group pair \eqn{(q,l)}. Works also for vectors of indices \eqn{q} and \eqn{l}.
+#' Gives the index in \eqn{1, \ldots, Q^2} (directed) or \eqn{1, \ldots, Q(Q+1)/2} (undirected) that corresponds to group pair \eqn{(q,l)}. Works also for vectors of indices \eqn{q} and \eqn{l}.
 #'
 #' Relations between groups \eqn{(q,l)} are stored in vectors, whose indexes depend on whether the graph is directed or undirected.
 #' \describe{
 #'   \item{\strong{Directed case :}}{
 #'     \itemize{
-#'       \item The \eqn{(q,l)} group pair is converted into the index \eqn{(q-1)*Q+l}
+#'       \item The \eqn{(q,l)} group pair is converted into the index \eqn{(q-1)Q+l}
 #'     }
 #'   }
 #'   \item{\strong{Undirected case :}}{
 #'     \itemize{
-#'       \item The \eqn{(q,l)} group pair with \eqn{q<=l} is converted into the index \eqn{(2*Q-q+2)*(q-1)/2 +l-q+1}
+#'       \item The \eqn{(q,l)} group pair with \eqn{q\leq l} is converted into the index \eqn{(2Q-q+2)*(q-1)/2 +l-q+1}
 #'     }
 #'   }
 #' }
@@ -134,7 +137,7 @@ listNodePairs <- function(n,directed=TRUE){
 #' @export
 #'
 #' @examples
-#' # Convert the group pair (3,2) into an index, where the total number of group is 3,
+#' # Convert the group pair (3,2) into an index, where the total number of groups is 3,
 #' # for directed and undirected graph
 #'
 #' q <- 3
@@ -162,8 +165,8 @@ convertGroupPair <- function(q,l,Q,directed=TRUE){
 
 #' Convert index into group pair
 #'
-#' This function is the inverse of the conversion \eqn{{(q,l), q,l} } into \eqn{{1,...,Q^2}} for the directed case \eqn{{(q,l), q<= l}} into \eqn{{1,...,Q*(Q+1)/2}} for the undirected case.
-#' It takes the integer index corresponding to \eqn{(q,l)} and returns \eqn{(q,l)}.
+#' This function is the inverse of the conversion \eqn{\{(q,l), 1 \le q,l\le Q \} } into \eqn{\{1,...,Q^2\}} for the directed case and of \eqn{\{(q,l), 1 \le q \le  l \le Q \}} into \eqn{\{1,...,Q(Q+1)/2\}} for the undirected case.
+#' It takes the integer index corresponding to \eqn{(q,l)} and returns the pair \eqn{(q,l)}.
 #'
 #' @param ind_ql Converted \eqn{(q,l)} index
 #' @param Q Total number of groups \eqn{Q}
@@ -176,7 +179,7 @@ convertGroupPair <- function(q,l,Q,directed=TRUE){
 #' @examples
 #' # Convert the index 5 into a group pair for undirected graph
 #' # and the index 8 into a group pair for directed graph
-#' # where the total number of group is 3
+#' # where the total number of groups is 3
 #'
 #' ind_ql_dir <- 8
 #' ind_ql_undir <- 5
@@ -214,7 +217,7 @@ find_ql <- function(ind_ql, Q,directed=TRUE){
 #'
 #' @return Group pair \eqn{(q,l)} corresponding to the given index
 #'
-#' @export
+#' @keywords internal
 #'
 find_ql_diff <- function(ind_ql,Q){
   if (ind_ql > Q*(Q-1)/2){
@@ -238,7 +241,7 @@ find_ql_diff <- function(ind_ql,Q){
 #'
 #' @param tau \eqn{\tau}
 #'
-#' @export
+#' @keywords internal
 #'
 correctTau <- function(tau){
   tau <- pmin(tau,.Machine$double.xmax)
@@ -259,25 +262,25 @@ correctTau <- function(tau){
 
 #' Compute statistics
 #'
-#' Convert the initial data into the statistics matrix \eqn{N_{ijk}}, by counting the number of events for the nodes during the subintervals of a particular partition of the time interval.
+#' Convert the initial data into the statistics matrix \eqn{N_{(ij),k}}, by counting the number of events for the nodes pair types \eqn{(i,j)} during the \eqn{k}-th subinterval of a regular partition (in \eqn{K} parts) of the time interval.
 #'
 #'
-#' @param data List with $type.seq, $time.seq
-#' @param n Total number of nodes : \eqn{i,j\in {1, \ldots, n} }
-#' @param K Size of the regular partition, i.e. number of subintervals
-#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
+#' @param data List with 3 components \code{$type.seq, $time.seq, $Time} (see \link[ppsbm]{mainVEM} for more details). 
+#' @param n Total number of nodes,  \eqn{1\le i \le n}.
+#' @param K Size of the regular partition, i.e. number of subintervals of the time interval. When used as input in the VEM algorithm (with \code{hist} method), \eqn{K} must be a power of 2.
+#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case.
 #'
-#' @return N(i,j)k = number of events for the node (i,j) during the k-th subinterval
+#' @return N[(i,j),k] = matrix with \eqn{K} columns, each row contains the number of events for the node pair \eqn{(i,j)} during the k-th subinterval
 #'
 #' @export
 #'
 #' @examples
-#' # Convert the generated data into the statistics matrix N_ijk with 8 columns
+#' # Convert the generated data into the statistics matrix N_ijk with 8 subintervals
 #'
 #' n <- 50
-#' Dmax <- 2^3
+#' K <- 2^3
 #'
-#' obs <- statistics(generated_Q3$data,n,Dmax,directed=FALSE)
+#' obs <- statistics(generated_Q3$data,n,K,directed=FALSE)
 #'
 statistics <- function(data,n,K,directed=TRUE){
   partition <- data$Time*seq(1/K,1,by=1/K)

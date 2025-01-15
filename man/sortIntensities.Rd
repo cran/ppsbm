@@ -7,29 +7,31 @@
 sortIntensities(intensities, z, hat.z, directed)
 }
 \arguments{
-\item{intensities}{Intensities \eqn{\alpha}}
+\item{intensities}{Matrix whose rows contain piecewise constant intensities \eqn{\alpha^{(q,l)}}, given as a vector of values on a regular partition of the time interval.}
 
-\item{z}{Matrice of size  \eqn{Q \times n}}
+\item{z}{Matrix of size  \eqn{Q \times n}.}
 
-\item{hat.z}{Matrice of size  \eqn{Q \times n}}
+\item{hat.z}{Matrix of size  \eqn{Q \times n}.}
 
-\item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case}
+\item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case.}
 }
 \description{
-Sort intensities associated with hat.z "in the same way" as the original intensities associated with z by permutation of rows
+Sort intensities associated with the estimated clustering \eqn{\hat z} "in the same way" as the original intensities associated with true clustering \eqn{z} by permutation of rows.
 }
 \examples{
-
+# True and estimated clusters for n=6 nodes clustered into Q=3 groups
 z <- matrix(c(1,1,0,0,0,0, 0,0,1,1,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
 hat.z <- matrix(c(0,0,1,1,0,0, 1,1,0,0,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
 
+# Set constant intensities for each directed pair (q,l)
 intens <- matrix(c(1,1,1,2,2,2,3,3,3),9)
 
+# Permute the rows according to the permutation that "matches" hat.z with z
 sortIntensities(intens,z,hat.z, TRUE)
 
 }
 \references{
 HUBERT, L. & ARABIE, P. (1985). Comparing partitions. J. Classif. 2, 193–218.
 
-MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 }

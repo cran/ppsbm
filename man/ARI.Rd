@@ -7,9 +7,9 @@
 ARI(z, hat.z)
 }
 \arguments{
-\item{z}{Matrix of size  \eqn{Q \times n} with entries = 0 or 1 : 'true' latent variables}
+\item{z}{Matrix of size  \eqn{Q \times n} with entries = 0 or 1: 'true' latent variables}
 
-\item{hat.z}{Matrix of \eqn{Q \times n}  with 0<entries<1 : estimated latent variables}
+\item{hat.z}{Matrix of \eqn{Q \times n}  with 0<entries<1: estimated latent variables}
 }
 \description{
 Compute the Adjusted Rand Index (ARI) between the true latent variables and the estimated latent variables
@@ -21,4 +21,7 @@ hat.z <- matrix(c(0,0,1,1,0,0, 1,1,0,0,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE
 
 ARI(z, hat.z)
 
+}
+\references{
+HUBERT, L. & ARABIE, P. (1985). Comparing partitions. J. Classif. 2, 193–218.
 }

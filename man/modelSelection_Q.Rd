@@ -2,43 +2,63 @@
 % Please edit documentation in R/output.R
 \name{modelSelection_Q}
 \alias{modelSelection_Q}
-\title{Selects the number of groups with ICL}
+\title{Selects the number of groups with ICL criterion}
 \usage{
-modelSelection_Q(data, n, Qmin = 1, Qmax, directed = TRUE, sparse = FALSE,
-  sol.hist.sauv)
+modelSelection_Q(
+  data,
+  n,
+  Qmin = 1,
+  Qmax,
+  directed = TRUE,
+  sparse = FALSE,
+  sol.hist.sauv
+)
 }
 \arguments{
 \item{data}{List with 2 components:
 \itemize{
-  \item $Time - [0,data$Time] is the total time interval of observation
-  \item $Nijk - data matrix with the statistics per process \eqn{N_{ij}} and sub-intervals \eqn{k}
+  \item \code{Time} - Positive real number. [0,Time] is the total time interval of observation.
+  \item \code{Nijk} - Data matrix with the statistics per process \eqn{N_{ij}} and sub-intervals \eqn{1\le k\le K}.
 }}
 
-\item{n}{Total number of nodes \eqn{n}}
+\item{n}{Total number of nodes,  \eqn{1\le i \le n}.}
 
-\item{Qmin}{Minimum number of groups}
+\item{Qmin}{Minimum number of groups.}
 
-\item{Qmax}{Maximum number of groups}
+\item{Qmax}{Maximum number of groups.}
 
-\item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case}
+\item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case.}
 
-\item{sparse}{Boolean for sparse (TRUE) or not sparse (FALSE) case}
+\item{sparse}{Boolean for sparse (TRUE) or not sparse (FALSE) case.}
 
-\item{sol.hist.sauv}{List of size Qmax-Qmin+1 obtained from running mainVEM(data,n,Qmin,Qmax,method='hist')}
+\item{sol.hist.sauv}{List of size Qmax-Qmin+1 obtained from running \link[ppsbm]{mainVEM} on the data with method='hist'.}
+}
+\value{
+The function outputs a list of 7 components:
+\itemize{
+ \item {\code{Qbest}} Selected value of the number of groups in [Qmin, Qmax].
+ \item {\code{sol.Qbest}} Solution of the \link[ppsbm]{mainVEM} function for the number of groups Qbest.
+ \item {\code{Qmin}} Minimum number of groups used.
+ \item {\code{all.J}} Vector of length Qmax-Qmin+1. Each value is the estimated ELBO function \eqn{J} for estimation with \eqn{Q} groups, \eqn{Qmin \le Q \le Qmax}.
+ \item {\code{all.ICL}} Vector of length Qmax-Qmin+1. Each value is the ICL value for estimation with \eqn{Q} groups, \eqn{Qmin \le Q \le Qmax}.
+ \item {\code{all.compl.log.likelihood}} Vector of length Qmax-Qmin+1. Each value is the estimated complete log-likelihood value for estimation with \eqn{Q} groups, \eqn{Qmin \le Q \le Qmax}.
+ \item {\code{all.pen}} Vector of length Qmax-Qmin+1. Each value is the penalty term in ICL for estimation with \eqn{Q} groups, \eqn{Qmin \le Q \le Qmax}.
+}
 }
 \description{
-Selects the number of groups with Integrated Classification Likelihood Criterion
+Selects the number of groups with Integrated Classification Likelihood (ICL) criterion.
 }
 \examples{
 # load data of a synthetic graph with 50 individuals and 3 clusters
 n <- 50
 
-# compute data matrix with precision d_max=3
-Dmax <- 2^3
-data <- list(Nijk=statistics(generated_Q3$data,n,Dmax,directed=FALSE),
+# compute data matrix of counts per subinterval with precision d_max=3
+# (ie nb of parts K=2^{d_max}=8).
+K <- 2^3
+data <- list(Nijk=statistics(generated_Q3$data,n,K,directed=FALSE),
     Time=generated_Q3$data$Time)
 
-# ICL-model selection
+# ICL-model selection with groups ranging from 1 to 4
 sol.selec_Q <- modelSelection_Q(data,n,Qmin=1,Qmax=4,directed=FALSE,
     sparse=FALSE,generated_sol_hist)
 
@@ -53,5 +73,5 @@ CORNELI, M., LATOUCHE, P. & ROSSI, F. (2016). Exact ICL maximization in a non-st
 
 DAUDIN, J.-J., PICARD, F. & ROBIN, S. (2008). A mixture model for random graphs. Statist. Comput. 18, 173–183.
 
-MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 }

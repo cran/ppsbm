@@ -17,3 +17,4 @@ Group pair \eqn{(q,l)} corresponding to the given index
 \description{
 This function is the inverse of the conversion \eqn{{(q,l), q<l}} into \eqn{{1,...,Q*(Q-1)/2}}. Used only in tauDown_Q.
 }
+\keyword{internal}

@@ -2,30 +2,30 @@
 % Please edit documentation in R/generator.R
 \name{generatePP}
 \alias{generatePP}
-\title{Poisson process}
+\title{Poisson process generator}
 \usage{
 generatePP(intens, Time, max.intens)
 }
 \arguments{
-\item{intens}{Intensity function defined on [0,Time] (needs to be positive)}
+\item{intens}{Intensity function defined on [0,Time] (needs to be positive).}
 
-\item{Time}{Final time}
+\item{Time}{Positive real number. [0,Time] is the total time interval of observation.}
 
-\item{max.intens}{Upper bound of intensity on [0,Time]}
+\item{max.intens}{Positive real number. Upper bound of intensity on [0,Time].}
 }
 \value{
-Vector of realizations of the PP
+Vector with the values of one realization of the PP.
 }
 \description{
-Generate realizations of an inhomogeneous Poisson process with an intensity function
+Generates one realization of an inhomogeneous Poisson process (PP) with given intensity function (using the thinning method).
 }
 \examples{
-# Generate a Poisson Process with intensity function
+# Generate a Poisson Process on time interval [0,30] with intensity function
 # intens= function(x) 100*x*exp(-8*x)
-# and max.intens = 5
+# using max.intens = 5
 
 intens <- function(x) 100*x*exp(-8*x)
 
-poissonProcess <- generatePP(intens, Time=30, max.intens=1)
+generatePP(intens, Time=30, max.intens=5)
 
 }

@@ -2,20 +2,24 @@
 % Please edit documentation in R/generator.R
 \name{generatePPConst}
 \alias{generatePPConst}
-\title{Poisson process  with piecewise constant intensities}
+\title{Poisson process with piecewise constant intensity}
 \usage{
 generatePPConst(intens, Time)
 }
 \arguments{
-\item{intens}{Vector with the constants of the intensities (defined on a regular partition of interval [0,Time])}
+\item{intens}{Vector with the constant values of the intensity, defined on a regular partition of the time interval [0,Time].}
 
-\item{Time}{Time}
+\item{Time}{Positive real number. [0,Time] is the total time interval of observation.}
 }
 \description{
-Generate realizations of a Poisson process with piecewise constant intensities
+Generates one realization of a Poisson process (PP) with a piecewise constant intensity function.
 }
 \examples{
-intens <- c(1,3,8)
-constpp <- generatePPConst(intens, 10)
+# On time interval [0,T], partitioned into 3 regular parts: [0,T/3], [T/3,2T/3] and [2T/3,T],
+# define a piecewise constant intensity function
+intens <- c(1,2,8)
+
+# generate a PP with total observation time T=10
+generatePPConst(intens, 10)
 
 }

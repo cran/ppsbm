@@ -29,24 +29,24 @@
 #'
 #' @return List of matrixes of initial values for \eqn{\tau}
 #'
-#' @export
+#' @keywords internal
 #'
-#' @examples
-#' # Generate initial tau for generated_Q3 data
-#'
-#' n <- 50
-#' Dmax <- 2^3
-#' Q <- 3
-#' d_part <- 1 # less than 3 (owing to Dmax)
-#' n_perturb <- 2
-#' perc_perturb <- 0.2
-#' n_random <- 1
-#' directed <- FALSE
-#'
-#' data <- list(Nijk = statistics(generated_Q3$data, n, Dmax, directed = FALSE))
-#'
-#' tau <- tauInitial(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
-#'
+# # Examples
+# # Generate initial tau for generated_Q3 data
+#
+# n <- 50
+# Dmax <- 2^3
+# Q <- 3
+# d_part <- 1 # less than 3 (owing to Dmax)
+# n_perturb <- 2
+# perc_perturb <- 0.2
+# n_random <- 1
+# directed <- FALSE
+#
+# data <- list(Nijk = statistics(generated_Q3$data, n, Dmax, directed = FALSE))
+#
+# tau <- tauInitial(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
+#
 tauInitial <- function(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed){
   nbstart <- (2^(d_part+1)-1)*(1+n_perturb)
   init.values <- list()
@@ -106,26 +106,26 @@ tauInitial <- function(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
 #'
 #' @return Both \eqn{\tau} and \eqn{\rho}.
 #'
-#' @export
+#' @keywords internal
 #'
-#' @examples
-#' # Generate first initial tau for generated_Q3 data
-#'
-#' n <- 50
-#' Dmax <- 2^3
-#' Q <- 3
-#' d_part <- 1 # less than 3 (owing to Dmax)
-#' n_perturb <- 2
-#' perc_perturb <- 0.2
-#' n_random <- 1
-#' directed <- FALSE
-#'
-#' data <- list(Nijk = statistics(generated_Q3$data, n, Dmax, directed = FALSE))
-#'
-#' tau <- tauInitial(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
-#'
-#' taurho <- taurhoInitial(tau[[1]],data,n,Q,directed=FALSE)
-#'
+# # Examples
+# # Generate first initial tau for generated_Q3 data
+#
+# n <- 50
+# Dmax <- 2^3
+# Q <- 3
+# d_part <- 1 # less than 3 (owing to Dmax)
+# n_perturb <- 2
+# perc_perturb <- 0.2
+# n_random <- 1
+# directed <- FALSE
+#
+# data <- list(Nijk = statistics(generated_Q3$data, n, Dmax, directed = FALSE))
+#
+# tau <- tauInitial(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
+#
+# taurho <- taurhoInitial(tau[[1]],data,n,Q,directed=FALSE)
+#
 taurhoInitial <- function(tau,data,n,Q,directed=TRUE){
   if (directed){
     N <- n*(n-1)
@@ -174,26 +174,26 @@ taurhoInitial <- function(tau,data,n,Q,directed=TRUE){
 #'
 #' @return List of matrixes of initial values for \eqn{\tau} for \eqn{Q} groups from value obtained at \eqn{Q-1}
 #'
-#' @export
+#' @keywords internal
 #'
-#' @examples
-#' # Generate first initial tau for generated_Q3 data
-#'
-#' n <- 50
-#' Dmax <- 2^3
-#' Q <- 3
-#' d_part <- 1 # less than 3 (owing to Dmax)
-#' n_perturb <- 2
-#' perc_perturb <- 0.2
-#' n_random <- 1
-#' directed <- FALSE
-#'
-#' data <- list(Nijk = statistics(generated_Q3$data, n, Dmax, directed = FALSE))
-#'
-#' tau <- tauInitial(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
-#'
-#' tau.list <- tauUp_Q(tau[[1]],1)
-#'
+# # Examples
+# # Generate first initial tau for generated_Q3 data
+#
+# n <- 50
+# Dmax <- 2^3
+# Q <- 3
+# d_part <- 1 # less than 3 (owing to Dmax)
+# n_perturb <- 2
+# perc_perturb <- 0.2
+# n_random <- 1
+# directed <- FALSE
+#
+# data <- list(Nijk = statistics(generated_Q3$data, n, Dmax, directed = FALSE))
+#
+# tau <- tauInitial(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
+#
+# tau.list <- tauUp_Q(tau[[1]],1)
+#
 tauUp_Q <- function(tau,n_perturb=1){
   Q <- dim(tau)[1]
   n <- dim(tau)[2]
@@ -251,26 +251,26 @@ tauUp_Q <- function(tau,n_perturb=1){
 #'
 #' @return List of matrixes of initial values for \eqn{\tau} for \eqn{Q} groups from value obtained at \eqn{Q+1}
 #'
-#' @export
+#' @keywords internal
 #'
-#' @examples
-#' # Generate first initial tau for generated_Q3 data
-#'
-#' n <- 50
-#' Dmax <- 2^3
-#' Q <- 3
-#' d_part <- 1 # less than 3 (owing to Dmax)
-#' n_perturb <- 2
-#' perc_perturb <- 0.2
-#' n_random <- 1
-#' directed <- FALSE
-#'
-#' data <- list(Nijk = statistics(generated_Q3$data, n, Dmax, directed = FALSE))
-#'
-#' tau <- tauInitial(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
-#'
-#' tau.list <- tauDown_Q(tau[[1]],1)
-#'
+# # Examples
+# # Generate first initial tau for generated_Q3 data
+#
+# n <- 50
+# Dmax <- 2^3
+# Q <- 3
+# d_part <- 1 # less than 3 (owing to Dmax)
+# n_perturb <- 2
+# perc_perturb <- 0.2
+# n_random <- 1
+# directed <- FALSE
+#
+# data <- list(Nijk = statistics(generated_Q3$data, n, Dmax, directed = FALSE))
+#
+# tau <- tauInitial(data,n,Q,d_part,n_perturb,perc_perturb,n_random,directed)
+#
+# tau.list <- tauDown_Q(tau[[1]],1)
+#
 tauDown_Q <- function(tau,n_perturb=1){
   Q <- dim(tau)[1]
   n <- dim(tau)[2]
@@ -324,7 +324,7 @@ tauDown_Q <- function(tau,n_perturb=1){
 #'
 #' @return x    : class indicator matrix
 #'
-#' @export
+#' @keywords internal
 #'
 classInd<-function (cl){
   ## INPUT
@@ -368,19 +368,19 @@ classInd<-function (cl){
 #'
 #' @return Initial values for \eqn{\tau}
 #'
-#' @export
+#' @keywords internal
 #'
-#' @examples
-#'
-#' n <- 50
-#' Q <- 3
-#'
-#' Dmax <- 2^3
-#'
-#' Nijk <- statistics(generated_Q3$data,n,Dmax,directed=FALSE)
-#'
-#' tau <- tauKmeansSbm(Nijk,n,Q,FALSE)
-#'
+# #Examples
+#
+# n <- 50
+# Q <- 3
+#
+# Dmax <- 2^3
+#
+# Nijk <- statistics(generated_Q3$data,n,Dmax,directed=FALSE)
+#
+# tau <- tauKmeansSbm(Nijk,n,Q,FALSE)
+#
 tauKmeansSbm <- function(statistics,n,Q,directed){
   X   <- matrix(0,n,n)
   if (!directed){

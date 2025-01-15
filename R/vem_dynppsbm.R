@@ -3,43 +3,45 @@
 ############################################################
 
 
-
 ###################################################
 ## ADAPTIVE VEM ALGORITHM
 ###################################################
 
-#' Adaptative VEM algorithm
+#' Adaptive VEM algorithm
 #'
-#' Principal adaptative VEM algorithm for histogram with model selection or for kernel method.
+#' Principal adaptive VEM algorithm for histogram (with model selection) or for kernel method.
 #'
 #' The sparse version works only for the histogram approach.
 #'
 #' @param data Data format depends on the estimation method used!!
 #' \enumerate{
-#'   \item Data with \strong{hist} method - list with 2 components:
+#'   \item Data with \strong{hist} method - List with 2 components:
 #'     \describe{
-#'       \item{data$Time}{[0,data$Time] is the total time interval of observation}
+#'       \item{data$Time}{Positive real number. [0,data$Time] is the total time interval of observation}
 #'
-#'       \item{data$Nijk}{Data matrix with counts per process \eqn{N_{ij}} and sub-intervals ; matrix of size \eqn{N*Dmax}  where \eqn{N = n(n-1)} or \eqn{n(n-1)/2} is the number of possible node pairs in the graph and \eqn{Dmax = 2^{dmax}} is the size of the finest partition in the  histrogram approach
+#'       \item{data$Nijk}{Data matrix with counts per process \eqn{N_{ij}} and sub-intervals ; matrix of size \eqn{N*K}  where \eqn{N = n(n-1)} or \eqn{n(n-1)/2} is the number of possible node pairs in the graph and \eqn{K = 2^{dmax}} is the size of the finest partition in the  histogram approach.
 #'
-#'       Counts are pre-computed - Obtained through function 'statistics' (auxiliary.R) on data with second format}
+#'       Counts are pre-computed - Obtained through function \link[ppsbm]{statistics} on data with second format and using a number of subintervals K as a power of 2.}
 #'     }
 #'
-#'   \item Data with \strong{kernel} method - list with 3 components:
+#'   \item Data with \strong{kernel} method - List with 3 components:
 #'     \describe{
-#'       \item{data$time.seq}{Sequence of observed time points of the m-th event (M-vector)}
+#'       \item{data$time.seq}{Vector of the time points of the events (size M).}
 #'
-#'       \item{data$type.seq}{Sequence of observed values convertNodePair(i,j,n,directed) (auxiliary.R) of process that produced the mth event (M-vector).}
+#'       \item{data$type.seq}{Vector of the corresponding node pair indexes in format output by \link[ppsbm]{convertNodePair} of the events (same size M).}
 #'
 #'     \item{data$Time}{[0,data$Time] is the total time interval of observation}
 #'     }
 #' }
-#' @param n Total number of nodes
+#' @param n Total number of nodes,  \eqn{1\le i \le n}
 #' @param Qmin Minimum number of groups
 #' @param Qmax Maximum number of groups
 #' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
 #' @param sparse Boolean for sparse (TRUE) or not sparse (FALSE) case
-#' @param method List of string. Can be "hist" for histogram method or "kernel" for kernel method
+#' @param method Either \code{hist} for histogram method or \code{kernel} for kernel method
+#'
+#' Beware: \code{hist} is recommended (much faster). You can obtain smooth estimated intensities by using \link[ppsbm]{kernelIntensities} on the output of the \code{hist} method.
+#'
 #' @param init.tau List of initial values of \eqn{\tau} - all tau's are matrices with size \eqn{Q\times n} (might be with different values of Q)
 #' @param cores Number of cores for parallel execution
 #'
@@ -66,6 +68,19 @@
 #'
 #'    The file will contain a list of 'best' results.
 #'
+#' @return
+#' The function outputs a list of Qmax-Qmin+1 components. Each component is the solution obtained for a number of clusters Q, with \eqn{Qmin\le Q \le Qmax} and is a list of 8 elements:
+#'  \itemize{
+#'    \item {\code{tau}} - Matrix with size \eqn{Q\times n} containing the estimated values in \eqn{(0,1)} that cluster q contains node i.
+#'    \item {\code{rho}} - When method=\code{hist} only. Either 1 (non sparse method) or a vector with length \eqn{Q(Q+1)/2} (undirected case) or \eqn{Q^2} (directed case) with estimated values for the sparsity parameters \eqn{\rho^{(q,l)}}. See Section S6 in the supplementary material paper of Matias et al. (Biometrika, 2018) for more details.
+#'    \item {\code{beta}} - When method=\code{hist} only. Vector with length \eqn{Q(Q+1)/2} (undirected case) or \eqn{Q^2} (directed case) with estimated values for the sparsity parameters \eqn{\beta^{(q,l)}}. See Section S6 in the supplementary material paper Matias et al. (Biometrika, 2018) for more details.
+#'    \item {\code{logintensities.ql}} - When method=\code{hist} only. Matrix with size \eqn{Q(Q+1)/2\times K} (undirected case) or \eqn{Q^2\times K} (directed case). Each row contains estimated values of the log intensity function \eqn{\log(\alpha^{(q,l)})} on a regular partition with K parts of the time interval [0,Time].
+#'    \item {\code{best.d}} - When method=\code{hist} only. Vector with length \eqn{Q(Q+1)/2} (undirected case) or \eqn{Q^2} (directed case) with estimated value for the exponent of the best partition to estimate intensity \eqn{\alpha^{(q,l)}}. The best number of parts is \eqn{K=2^d}.
+#'    \item {\code{J}} - Estimated value of the ELBO.
+#'    \item {\code{run}} - Which run of the algorithm gave the best solution. A run relies on a specific initialization of the algorithm. A negative value maybe obtained in the decreasing phase (for Q) of the algorithm.
+#'    \item {\code{converged}} - Boolean. If TRUE, the algorithm stopped at convergence. Otherwise it stopped at the maximal number of iterations.
+#'  }
+#'
 #' @export
 #'
 #' @references
@@ -76,7 +91,7 @@
 #'
 #' JORDAN, M., GHAHRAMANI, Z., JAAKKOLA, T. & SAUL, L. (1999). An introduction to variational methods for graphical models. Mach. Learn. 37, 183–233.
 #'
-#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 #'
 #' MATIAS, C. & ROBIN, S. (2014). Modeling heterogeneity in random graphs through latent space models: a selective review. Esaim Proc. & Surveys 47, 55–74.
 #'
@@ -103,9 +118,9 @@
 #'     directed=FALSE)
 #'
 #' # VEM-algo hist
-#' # compute data matrix with precision d_max=3
-#' Dmax <- 2^3
-#' Nijk <- statistics(data,n,Dmax,directed=FALSE)
+#' # compute data matrix with precision d_max=3 (ie nb of parts K=2^{d_max}=8).
+#' K <- 2^3
+#' Nijk <- statistics(data,n,K,directed=FALSE)
 #' sol.hist <- mainVEM(list(Nijk=Nijk,Time=Time),n,Q,directed=FALSE, method='hist',
 #'     d_part=0,n_perturb=0,n_random=0)[[1]]
 #' log.intensities.hist <- sortIntensities(sol.hist$logintensities.ql,z,sol.hist$tau,
@@ -121,8 +136,8 @@
 #'     values <- c(intensities.kernel[ind.ql,],exp(log.intensities.hist[ind.ql,]),true.val)
 #'     plot(x0,true.val,type='l',xlab=paste0("(q,l)=(",q,",",l,")"),ylab='',
 #'         ylim=c(0,max(values)+.1))
-#'     lines(seq(0,1,by=1/Dmax),c(exp(log.intensities.hist[ind.ql,]),
-#'         exp(log.intensities.hist[ind.ql,Dmax])),type='s',col=2,lty=2)
+#'     lines(seq(0,1,by=1/K),c(exp(log.intensities.hist[ind.ql,]),
+#'         exp(log.intensities.hist[ind.ql,K])),type='s',col=2,lty=2)
 #'     lines(seq(0,1,by=.001),intensities.kernel[ind.ql,],col=4,lty=3)
 #'   }
 #' }
@@ -158,6 +173,7 @@ mainVEM <- function(data,
   }
 
   if (method=='kernel'){
+    cat("Warning: this is going to be long... Think of using method hist instead :)")
     if (is.null(data$time.seq))
       stop("Check input format for 'kernel' inference method")
     if (is.null(data$type.seq))
@@ -228,7 +244,7 @@ mainVEM <- function(data,
           if (method=='hist'){
             best[[Q-Qmin+1]] <- list(tau=VE$tau,rho=VE$rho,beta=mstep$beta,logintensities.ql=mstep$logintensities.ql,best.d=mstep$best.d,J=J,run=run,converged= convergence$converged)
           } else { # method=='kernel' - note that sparse inference not implemented
-            best[[Q-Qmin+1]] <- list(tau=VE$tau,logintensities.ql.ij=mstep$logintensities.ql.ij,J=J,run=run,converged= convergence$converged)
+            best[[Q-Qmin+1]] <- list(tau=VE$tau,J=J,run=run,converged= convergence$converged)
           }
 
       } # end loop for run
@@ -285,7 +301,7 @@ mainVEM <- function(data,
               # encode run with negative integer to distinguish from increasing phase
               best[[Q-Qmin+1]] <- list(tau=VE$tau,rho=VE$rho,beta=mstep$beta,logintensities.ql=mstep$logintensities.ql,best.d=mstep$best.d,J=J,run=-run,converged= convergence$converged)
             } else { # method=='kernel' - note that sparse inference not implemented
-              best[[Q-Qmin+1]] <- list(tau=VE$tau,logintensities.ql.ij=mstep$logintensities.ql.ij,J=J,run=-run,converged= convergence$converged)
+              best[[Q-Qmin+1]] <- list(tau=VE$tau,J=J,run=-run,converged= convergence$converged)
             }
 
         } # end loop for run
@@ -318,7 +334,7 @@ mainVEM <- function(data,
 #' VEM step for parallel version
 #'
 #' @param init.point Initial point
-#' @param n Total number of nodes
+#' @param n Total number of nodes,  \eqn{1\le i \le n}
 #' @param Q Total number of groups
 #' @param data Data same of \link[ppsbm]{mainVEM}
 #' @param directed  Boolean for directed (TRUE) or undirected (FALSE) case
@@ -328,7 +344,7 @@ mainVEM <- function(data,
 #' @param fix.iter Maximum number of iterations of the fixed point
 #' @param epsilon Threshold for the stopping criterion of VEM and fixed point iterations
 #'
-#' @export
+#' @keywords internal
 #'
 mainVEMPar <- function(init.point,n,Q,data,directed,sparse,method,nb.iter,fix.iter,epsilon){
   # Initialisation of tau
@@ -354,7 +370,7 @@ mainVEMPar <- function(init.point,n,Q,data,directed,sparse,method,nb.iter,fix.it
   if (method=='hist'){
     sol.run <- list(tau=VE$tau,rho=VE$rho,beta=mstep$beta,logintensities.ql=mstep$logintensities.ql,best.d=mstep$best.d,J=J,converged= convergence$converged)
   } else { # method='kernel' - note that sparse inference not implemented
-    sol.run <- list(tau=VE$tau,logintensities.ql.ij=mstep$logintensities.ql.ij,J=J,converged= convergence$converged)
+    sol.run <- list(tau=VE$tau,J=J,converged= convergence$converged)
   }
 
   return(sol.run)
@@ -377,13 +393,14 @@ mainVEMPar <- function(init.point,n,Q,data,directed,sparse,method,nb.iter,fix.it
 #' @param fix.iter Maximum number of iterations of the fixed point
 #' @param data Data same of \link[ppsbm]{mainVEM}
 #'
+#' @keywords internal
 #'
 VEstep <- function(VE,mstep,directed,sparse,method,epsilon,fix.iter,data){
   # variables
   Q <- dim(VE$tau)[[1]]
 
   # update rho in sparse case
-  rho <- if (sparse) 1/((1/mstep$beta-1)*exp(mstep$AqlT)+1) else 0
+  rho <- if (sparse) 1/((1/mstep$beta-1)*exp(mstep$AqlT)+1) else 1
 
   # compute pi
   pi <- if (Q!=1) apply(VE$tau,1,mean) else 1
@@ -416,9 +433,10 @@ VEstep <- function(VE,mstep,directed,sparse,method,epsilon,fix.iter,data){
 #' @param data Data same of \link[ppsbm]{mainVEM}
 #' @param directed  Boolean for directed (TRUE) or undirected (FALSE) case
 #' @param sparse Boolean for sparse (TRUE) or not sparse (FALSE) case
-#' @param method List of string. Can be "hist" for histogram method or "kernel" for kernel method
-#' @param rho Old \eqn{\rho} (only for sparse model, set to 0 otherwise)
+#' @param method List of string. Can be \code{hist} for histogram method or \code{kernel} for kernel method
+#' @param rho Old \eqn{\rho} (only for \code{sparse} model, set to 1 otherwise)
 #'
+#' @keywords internal
 #'
 tauUpdate <- function (tau,pi,mstep,data,directed,sparse,method,rho){
   Q <- dim(tau)[1]
@@ -442,8 +460,8 @@ tauUpdate <- function (tau,pi,mstep,data,directed,sparse,method,rho){
       for (i in 1:n){
         j.in.ij <- convertNodePair(rep(i,1,n-1),(1:n)[-i],n,directed)	 # n-1
         j.in.ji <- convertNodePair((1:n)[-i],rep(i,1,n-1),n,directed)	 # n-1
-        sum_tauj_Nijk <- tau[,-i]%*%as.matrix(data$Nijk[j.in.ij,]) # QxDmax
-        sum_tauj_Njik <- tau[,-i]%*%as.matrix(data$Nijk[j.in.ji,]) # QxDmax
+        sum_tauj_Nijk <- tau[,-i]%*%as.matrix(data$Nijk[j.in.ij,]) # QxK
+        sum_tauj_Njik <- tau[,-i]%*%as.matrix(data$Nijk[j.in.ji,]) # QxK
 
         for (q in 1:Q){
           ind.ql <- convertGroupPair(rep(q,1,Q),1:Q,Q,directed)  # indices of all groups (q,l) for l=1,...,Q
@@ -501,7 +519,7 @@ tauUpdate <- function (tau,pi,mstep,data,directed,sparse,method,rho){
     else{ # undirected
       for (i in 1:n){
         j.in.ij <- convertNodePair(rep(i,1,n-1),(1:n)[-i],n,directed)	 # n-1
-        sum_tauj_Nijk <- tau[,-i]%*%as.matrix(data$Nijk[j.in.ij,]) # QxDmax
+        sum_tauj_Nijk <- tau[,-i]%*%as.matrix(data$Nijk[j.in.ij,]) # QxK
 
         for (q in 1:Q){
           ind.ql <- convertGroupPair(rep(q,1,Q),1:Q,Q,directed)  # indices of all groups (q,l) for l=1,...,Q
@@ -566,9 +584,11 @@ tauUpdate <- function (tau,pi,mstep,data,directed,sparse,method,rho){
 #'
 #' BARAUD, Y. & BIRGÉ, L. (2009). Estimating the intensity of a random measure by histogram type estimators. Probab. Theory Related Fields 143, 239–284.
 #'
-#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 #'
 #' REYNAUD -BOURET, P. (2006). Penalized projection estimators of the Aalen multiplicative intensity. Bernoulli 12, 633–661.
+#'
+#' @keywords internal
 #'
 Mstep_hist <- function(data,VE,directed,sparse){
   Q <- dim(VE$tau)[1]
@@ -742,9 +762,11 @@ Mstep_hist <- function(data,VE,directed,sparse){
 #'
 #' GRÉGOIRE , G. (1993). Least squares cross-validation for counting process intensities. Scand. J. Statist. 20, pp. 343–360.
 #'
-#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 #'
 #' RAMLAU-HANSEN, H. (1983). Smoothing counting process intensities by means of kernel functions. Ann. Statist. 11, pp. 453–466.
+#'
+#' @keywords internal
 #'
 Mstep_kernel <- function(data,VE,directed){
   Q <- dim(VE$tau)[1]
@@ -862,6 +884,8 @@ Mstep_kernel <- function(data,VE,directed){
 #' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
 #' @param sparse Boolean for sparse (TRUE) or not sparse (FALSE) case
 #' @param method List of string. Can be "hist" for histogram method or "kernel" for kernel method
+#'
+#' @keywords internal
 #'
 JEvalMstep  <- function(VE, mstep,data,directed,sparse,method='hist'){
   Q <- dim(VE$tau)[1]

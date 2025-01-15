@@ -19,10 +19,11 @@ tauUpdate(tau, pi, mstep, data, directed, sparse, method, rho)
 
 \item{sparse}{Boolean for sparse (TRUE) or not sparse (FALSE) case}
 
-\item{method}{List of string. Can be "hist" for histogram method or "kernel" for kernel method}
+\item{method}{List of string. Can be \code{hist} for histogram method or \code{kernel} for kernel method}
 
-\item{rho}{Old \eqn{\rho} (only for sparse model, set to 0 otherwise)}
+\item{rho}{Old \eqn{\rho} (only for \code{sparse} model, set to 1 otherwise)}
 }
 \description{
 One update of \eqn{\tau} by the fixed point equation
 }
+\keyword{internal}

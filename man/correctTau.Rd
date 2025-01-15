@@ -12,3 +12,4 @@ correctTau(tau)
 \description{
 Avoid values of \eqn{\tau} to be exactly 0 and exactly 1.
 }
+\keyword{internal}

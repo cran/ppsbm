@@ -7,18 +7,19 @@
 modelSelec_QPlot(model.selec_Q)
 }
 \arguments{
-\item{model.selec_Q}{Output from modelSelection_Q()}
+\item{model.selec_Q}{Output from \link[ppsbm]{modelSelection_Q}.}
 }
 \description{
-Plots for model selection
+Plots the Integrated Classification Likelihood (ICL) criterion, the Complete Log-Likelihood (CLL) and the ELBO (J criterion).
 }
 \examples{
 # load data of a synthetic graph with 50 individuals and 3 clusters
 n <- 50
 
-# compute data matrix with precision d_max=3
-Dmax <- 2^3
-data <- list(Nijk=statistics(generated_Q3$data,n,Dmax,directed=FALSE),
+# compute data matrix of counts per subinterval with precision d_max=3 :
+# (ie nb of parts K=2^{d_max}=8).
+K <- 2^3
+data <- list(Nijk=statistics(generated_Q3$data,n,K,directed=FALSE),
     Time=generated_Q3$data$Time)
 
 # ICL-model selection

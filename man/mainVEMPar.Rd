@@ -4,13 +4,23 @@
 \alias{mainVEMPar}
 \title{VEM step for parallel version}
 \usage{
-mainVEMPar(init.point, n, Q, data, directed, sparse, method, nb.iter, fix.iter,
-  epsilon)
+mainVEMPar(
+  init.point,
+  n,
+  Q,
+  data,
+  directed,
+  sparse,
+  method,
+  nb.iter,
+  fix.iter,
+  epsilon
+)
 }
 \arguments{
 \item{init.point}{Initial point}
 
-\item{n}{Total number of nodes}
+\item{n}{Total number of nodes,  \eqn{1\le i \le n}}
 
 \item{Q}{Total number of groups}
 
@@ -31,3 +41,4 @@ mainVEMPar(init.point, n, Q, data, directed, sparse, method, nb.iter, fix.iter,
 \description{
 VEM step for parallel version
 }
+\keyword{internal}

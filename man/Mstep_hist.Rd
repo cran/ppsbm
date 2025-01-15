@@ -21,7 +21,8 @@ M step for histograms estimator
 \references{
 BARAUD, Y. & BIRGÉ, L. (2009). Estimating the intensity of a random measure by histogram type estimators. Probab. Theory Related Fields 143, 239–284.
 
-MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 
 REYNAUD -BOURET, P. (2006). Penalized projection estimators of the Aalen multiplicative intensity. Bernoulli 12, 633–661.
 }
+\keyword{internal}

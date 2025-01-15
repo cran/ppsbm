@@ -4,42 +4,50 @@
 \alias{kernelIntensities}
 \title{Direct kernel estimator intensities}
 \usage{
-kernelIntensities(data, tau, Q, n, directed, rho = 1, sparse = FALSE,
-  nb.points = 1000)
+kernelIntensities(
+  data,
+  tau,
+  Q,
+  n,
+  directed,
+  rho = 1,
+  sparse = FALSE,
+  nb.points = 1000 * data$Time
+)
 }
 \arguments{
 \item{data}{List with 3 components:
 \itemize{
-  \item data$time.seq : sequence of observed time points of the m-th event (M-vector)
-  \item data$type.seq : sequence of observed values convertNodePair(i,j,n,directed) (auxiliary.R)
-      of process that produced the mth event (M-vector)
-  \item $Time - [0,data$Time] is the total time interval of observation
+  \item \code{time.seq} - Vector of observed time points of the events (length \eqn{M}).
+  \item \code{type.seq} - Vector of observed types of node pairs (as encoded through \link[ppsbm]{convertNodePair} of the events (length \eqn{M})).
+  \item \code{Time} - [0,Time] is the total time interval of observation.
 }}
 
-\item{tau}{\eqn{\tau}}
+\item{tau}{Matrix with size \eqn{Q\times n} and values in \eqn{(0,1)}, containing the (estimated) probability that cluster \eqn{q} contains node \eqn{i}.}
 
-\item{Q}{Total number of groups}
+\item{Q}{Total number of groups.}
 
-\item{n}{Total number of nodes}
+\item{n}{Total number of nodes,  \eqn{1\le i \le n}.}
 
 \item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case}
 
-\item{rho}{\eqn{\rho}}
+\item{rho}{Either 1 (non sparse case) or vector with length \eqn{Q(Q+1)/2} (undirected case) or \eqn{Q^2} (directed case) with (estimated) values for the sparsity parameters \eqn{\rho^{(q,l)}}. See Section S6 in the supplementary material paper of Matias et al. (Biometrika, 2018) for more details.}
 
-\item{sparse}{Boolean for sparse (TRUE) or not sparse (FALSE) case}
+\item{sparse}{Boolean for sparse (TRUE) or not sparse (FALSE) case.}
 
-\item{nb.points}{Number of points}
+\item{nb.points}{Number of points for the kernel estimation.}
 }
 \description{
-Compute smooth intensities with direct kernel estimation of intensities relying on a classification tau.
-This can be used with the values \eqn{\tau} obtained on a dataset with mainVEM function run with 'hist' method.
+Compute smooth intensities with direct kernel estimation of intensities relying on a classification \eqn{\tau}.
+This can be used with the values \eqn{\tau} obtained on a dataset with \link[ppsbm]{mainVEM} function.
 }
 \details{
-Warning : sparse case not implemented !!!
+Warning: sparse case not implemented !!!
 }
 \examples{
 
-# The generated_sol_kernel was generated calling mainVEM with kernel method on the generated_Q3 data
+# The generated_sol_kernel solution was generated calling mainVEM
+# with kernel method on the generated_Q3$data dataset.
 # (50 individuals and 3 clusters)
 
 data <- generated_Q3$data
@@ -48,7 +56,7 @@ n <- 50
 Q <- 3
 
 
-# compute smooth intensity estimators
+# Compute smooth intensity estimators
 sol.kernel.intensities <- kernelIntensities(data,generated_sol_kernel$tau,Q,n,directed=FALSE)
 
 }

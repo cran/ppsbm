@@ -2,28 +2,26 @@
 #### Functions to generate data under dynppsbm
 ####################################################
 
-
-
-#' Poisson process
+#' Poisson process generator
 #'
-#' Generate realizations of an inhomogeneous Poisson process with an intensity function
+#' Generates one realization of an inhomogeneous Poisson process (PP) with given intensity function (using the thinning method).
 #'
-#' @param intens Intensity function defined on [0,Time] (needs to be positive)
-#' @param Time Final time
-#' @param max.intens Upper bound of intensity on [0,Time]
+#' @param intens Intensity function defined on [0,Time] (needs to be positive).
+#' @param Time Positive real number. [0,Time] is the total time interval of observation.
+#' @param max.intens Positive real number. Upper bound of intensity on [0,Time].
 #'
-#' @return Vector of realizations of the PP
+#' @return Vector with the values of one realization of the PP.
 #'
 #' @export
 #'
 #' @examples
-#' # Generate a Poisson Process with intensity function
+#' # Generate a Poisson Process on time interval [0,30] with intensity function
 #' # intens= function(x) 100*x*exp(-8*x)
-#' # and max.intens = 5
+#' # using max.intens = 5
 #'
 #' intens <- function(x) 100*x*exp(-8*x)
 #'
-#' poissonProcess <- generatePP(intens, Time=30, max.intens=1)
+#' generatePP(intens, Time=30, max.intens=5)
 #'
 generatePP <- function(intens, Time, max.intens){
   area <- Time*max.intens
@@ -37,29 +35,29 @@ generatePP <- function(intens, Time, max.intens){
 
 
 
-#' Data under dynppsbm
+#' Dynppsbm data generator
 #'
-#' Generate data under dynppsbm
+#' Generates data under the Dynamic Poisson Process Stochastic Blockmodel (dynppsbm).
 #'
-#' @param intens List containing intensity functions \eqn{\alpha^{(q,l)}} and upper bounds of intensities
-#' @param Time Final time
-#' @param n Total number of nodes
+#' @param intens List of intensity functions \eqn{\alpha^{(q,l)}}, each one is a list of 2 components:
+#'  \itemize{
+#'    \item \code{intens} : a positive function. The intensity function  \eqn{\alpha^{(q,l)}}
+#'    \item \code{max} : positive real number. An upper bound on \eqn{\alpha^{(q,l)}}
+#'  }
+#' @param Time Positive real number. [0,Time] is the total time interval of observation.
+#' @param n Total number of nodes,  \eqn{1\le i \le n}.
 #' @param prop.groups Vector of group proportions (probability to belong to a group), should be of length \eqn{Q}
-#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case. If directed=TRUE then intens should be of length \eqn{Q^2} and if directed =FALSE then length \eqn{Q*(Q+1)/2}
+#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case.
 #'
-#' @return Simulated data, latent group variables and intensities \eqn{\alpha^{(q,l)}}
+#' If directed then \code{intens} should be of length \eqn{Q^2}, else of length \eqn{Q*(Q+1)/2}.
+#'
+#' @return Simulated data, latent group variables and intensities \eqn{\alpha^{(q,l)}}.
 #'
 #' @export
 #'
 #' @references
 #'
-#' ANDERSEN, P. K., BORGAN, Ø., GILL, R. D. & KEIDING, N. (1993). Statistical models based on counting processes. Springer Series in Statistics. Springer-Verlag, New York.
-#'
-#' DAUDIN, J.-J., PICARD, F. & ROBIN, S. (2008). A mixture model for random graphs. Statist. Comput. 18, 173–183.
-#'
-#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
-#'
-#' MATIAS, C. & ROBIN, S. (2014). Modeling heterogeneity in random graphs through latent space models: a selective review. Esaim Proc. & Surveys 47, 55–74.
+#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 #'
 #' @examples
 #' # Generate data from an undirected graph with n=10 individuals and Q=2 clusters
@@ -67,7 +65,7 @@ generatePP <- function(intens, Time, max.intens){
 #' # equal cluster proportions
 #' prop.groups <- c(0.5,0.5)
 #'
-#' # 3 different intensity functions :
+#' # 3 different intensity functions:
 #' intens <- list(NULL)
 #' intens[[1]] <- list(intens= function(x) 100*x*exp(-8*x),max=5)
 #'     # (q,l) = (1,1)
@@ -76,13 +74,13 @@ generatePP <- function(intens, Time, max.intens){
 #' intens[[3]] <- list(intens= function(x) 8.1*(exp(-6*abs(x-1/2))-.049),max=8)
 #'     # (q,l) = (2,2)
 #'
-#' # generate data :
+#' # generate data:
 #' obs <- generateDynppsbm(intens,Time=1,n=10,prop.groups,directed=FALSE)
 #'
 #' # latent variables (true clustering of the individuals)
 #' obs$z
 #'
-#' # number of time events :
+#' # number of time events:
 #' length(obs$data$time.seq)
 #'
 #' # number of interactions between each pair of individuals:
@@ -146,19 +144,22 @@ generateDynppsbm <- function(intens,Time,n,prop.groups,directed=TRUE){
 ####################################################
 
 
-
-#' Poisson process  with piecewise constant intensities
+#' Poisson process with piecewise constant intensity
 #'
-#' Generate realizations of a Poisson process with piecewise constant intensities
+#' Generates one realization of a Poisson process (PP) with a piecewise constant intensity function.
 #'
-#' @param intens Vector with the constants of the intensities (defined on a regular partition of interval [0,Time])
-#' @param Time Time
+#' @param intens Vector with the constant values of the intensity, defined on a regular partition of the time interval [0,Time].
+#' @param Time Positive real number. [0,Time] is the total time interval of observation.
 #'
 #' @export
 #'
 #' @examples
-#' intens <- c(1,3,8)
-#' constpp <- generatePPConst(intens, 10)
+#' # On time interval [0,T], partitioned into 3 regular parts: [0,T/3], [T/3,2T/3] and [2T/3,T],
+#' # define a piecewise constant intensity function
+#' intens <- c(1,2,8)
+#'
+#' # generate a PP with total observation time T=10
+#' generatePPConst(intens, 10)
 #'
 generatePPConst <- function(intens,Time){
   K <- length(intens)
@@ -175,19 +176,25 @@ generatePPConst <- function(intens,Time){
 
 #' Data under dynppsbm with piecewise constant intensities
 #'
-#' Generate data under dynppsbm with piecewise constant intensities
+#' Generate data under the Dynamic Poisson Process Stochastic Blockmodel (dynppsbm) with piecewise constant intensity functions.
 #'
-#' @param intens Matrix with piecewise constant intensities \eqn{\alpha^{(q,l)}} (each row gives the constants of the piecewise constant intensity for a group pair \eqn{(q,l)})
-#' @param Time Time
-#' @param n Total number of nodes
-#' @param prop.groups Vector of group proportions, should be of length \eqn{Q}
-#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
+#' @param intens Matrix with piecewise constant intensities \eqn{\alpha^{(q,l)}}. Each row gives the constant values of the piecewise constant intensity for a group pair \eqn{(q,l)} on a regular partition of the time interval [0,Time].
+#' @param Time Positive real number. [0,Time] is the total time interval of observation.
+#' @param n Total number of nodes,  \eqn{1\le i \le n}.
+#' @param prop.groups Vector of group proportions, should be of length \eqn{Q}.
+#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case.
 #'
-#' If directed then intens should be of length \eqn{Q^2} and if undirected then length \eqn{Q*(Q+1)/2}
+#' If directed then \code{intens} should be of length \eqn{Q^2}, else of length \eqn{Q*(Q+1)/2}.
 #'
 #' @export
 #'
+#' @references
+#'
+#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
+#'
 #' @examples
+#' # Define 2 different piecewise constant intensity functions
+#' # on a 3 parts regular partition of time interval [0,Time]
 #' intens1 <- c(1,3,8)
 #' intens2 <- c(2,3,6)
 #'
@@ -195,8 +202,8 @@ generatePPConst <- function(intens,Time){
 #'
 #' Time <- 10
 #' n <- 20
-#' prop.groups <- c(0.2,0.3)
-#' dynppsbm <- generateDynppsbmConst(intens,Time,n,prop.groups,directed=TRUE)
+#' prop.groups <- c(0.2,0.8)
+#' obs <- generateDynppsbmConst(intens,Time,n,prop.groups,directed=TRUE)
 #'
 generateDynppsbmConst <- function(intens,Time,n,prop.groups,directed=TRUE){
   Q <- length(prop.groups)

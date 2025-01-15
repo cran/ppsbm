@@ -7,11 +7,11 @@
 convertNodePair(i, j, n, directed)
 }
 \arguments{
-\item{i}{Node \eqn{i} : \eqn{i\in {1, \ldots, n} }}
+\item{i}{Node \eqn{i} : \eqn{i\in \{1, \ldots, n\} }}
 
-\item{j}{Node \eqn{j} : \eqn{j\in {1, \ldots, n} }}
+\item{j}{Node \eqn{j} : \eqn{j\in \{1, \ldots, n\} }}
 
-\item{n}{Total number of nodes : \eqn{i,j\in {1, \ldots, n} }}
+\item{n}{Total number of nodes,  \eqn{1\le i \le n}}
 
 \item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case}
 }
@@ -19,7 +19,11 @@ convertNodePair(i, j, n, directed)
 Index corresponding to the node pair
 }
 \description{
-Convert node pair \eqn{(i,j)} into an index
+Convert node pair \eqn{(i,j)} into an index in \eqn{\{1,\dots,N\}} where \eqn{N=n(n-1)} (directed case) or \eqn{N=n(n-1)/2} (undirected case).
+}
+\details{
+Interacting individuals \eqn{(i,j)} must be encoded into integer values in  \eqn{\{1,\dots,N\}} in describing the data. 
+ 
 \describe{
   \item{\strong{Directed case :}}{
     \itemize{
@@ -32,18 +36,17 @@ Convert node pair \eqn{(i,j)} into an index
     }
   }
 }
-}
-\details{
+
 The number of possible node pairs is
     \itemize{
       \item \eqn{N = n*(n-1)} for the directed case
       \item \eqn{N = n*(n-1)/2}  for the undirected case
     }
-which corresponds to the cardinality of data$type.seq
+which corresponds to the range of values for \code{data$type.seq}
 }
 \examples{
 # Convert the node pair (3,7) into an index, where the total number of nodes is 10,
-# for directed and undirected graph
+# for directed and undirected interactions
 
 i <- 3
 j <- 7

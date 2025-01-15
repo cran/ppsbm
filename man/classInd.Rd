@@ -15,3 +15,4 @@ x    : class indicator matrix
 \description{
 Function for k-means
 }
+\keyword{internal}

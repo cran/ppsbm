@@ -5,21 +5,32 @@
 
 
 
-#' Selects the number of groups with ICL
+#' Selects the number of groups with ICL criterion
 #'
-#' Selects the number of groups with Integrated Classification Likelihood Criterion
+#' Selects the number of groups with Integrated Classification Likelihood (ICL) criterion.
 #'
 #' @param data List with 2 components:
 #'   \itemize{
-#'     \item $Time - [0,data$Time] is the total time interval of observation
-#'     \item $Nijk - data matrix with the statistics per process \eqn{N_{ij}} and sub-intervals \eqn{k}
+#'     \item \code{Time} - Positive real number. [0,Time] is the total time interval of observation.
+#'     \item \code{Nijk} - Data matrix with the statistics per process \eqn{N_{ij}} and sub-intervals \eqn{1\le k\le K}.
 #'   }
-#' @param n Total number of nodes \eqn{n}
-#' @param Qmin Minimum number of groups
-#' @param Qmax Maximum number of groups
-#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
-#' @param sparse Boolean for sparse (TRUE) or not sparse (FALSE) case
-#' @param sol.hist.sauv List of size Qmax-Qmin+1 obtained from running mainVEM(data,n,Qmin,Qmax,method='hist')
+#' @param n Total number of nodes,  \eqn{1\le i \le n}.
+#' @param Qmin Minimum number of groups.
+#' @param Qmax Maximum number of groups.
+#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case.
+#' @param sparse Boolean for sparse (TRUE) or not sparse (FALSE) case.
+#' @param sol.hist.sauv List of size Qmax-Qmin+1 obtained from running \link[ppsbm]{mainVEM} on the data with method='hist'.
+#'
+#' @return The function outputs a list of 7 components:
+#' \itemize{
+#'  \item {\code{Qbest}} Selected value of the number of groups in [Qmin, Qmax].
+#'  \item {\code{sol.Qbest}} Solution of the \link[ppsbm]{mainVEM} function for the number of groups Qbest.
+#'  \item {\code{Qmin}} Minimum number of groups used.
+#'  \item {\code{all.J}} Vector of length Qmax-Qmin+1. Each value is the estimated ELBO function \eqn{J} for estimation with \eqn{Q} groups, \eqn{Qmin \le Q \le Qmax}.
+#'  \item {\code{all.ICL}} Vector of length Qmax-Qmin+1. Each value is the ICL value for estimation with \eqn{Q} groups, \eqn{Qmin \le Q \le Qmax}.
+#'  \item {\code{all.compl.log.likelihood}} Vector of length Qmax-Qmin+1. Each value is the estimated complete log-likelihood value for estimation with \eqn{Q} groups, \eqn{Qmin \le Q \le Qmax}.
+#'  \item {\code{all.pen}} Vector of length Qmax-Qmin+1. Each value is the penalty term in ICL for estimation with \eqn{Q} groups, \eqn{Qmin \le Q \le Qmax}.
+#' }
 #'
 #' @export
 #'
@@ -31,18 +42,19 @@
 #'
 #' DAUDIN, J.-J., PICARD, F. & ROBIN, S. (2008). A mixture model for random graphs. Statist. Comput. 18, 173–183.
 #'
-#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 #'
 #' @examples
 #' # load data of a synthetic graph with 50 individuals and 3 clusters
 #' n <- 50
 #'
-#' # compute data matrix with precision d_max=3
-#' Dmax <- 2^3
-#' data <- list(Nijk=statistics(generated_Q3$data,n,Dmax,directed=FALSE),
+#' # compute data matrix of counts per subinterval with precision d_max=3
+#' # (ie nb of parts K=2^{d_max}=8).
+#' K <- 2^3
+#' data <- list(Nijk=statistics(generated_Q3$data,n,K,directed=FALSE),
 #'     Time=generated_Q3$data$Time)
 #'
-#' # ICL-model selection
+#' # ICL-model selection with groups ranging from 1 to 4
 #' sol.selec_Q <- modelSelection_Q(data,n,Qmin=1,Qmax=4,directed=FALSE,
 #'     sparse=FALSE,generated_sol_hist)
 #'
@@ -66,7 +78,7 @@ modelSelection_Q <- function(data,
   all.pen  <- rep(NA,Qmax-Qmin+1)
   for (Qcand in Qmin:Qmax){
     cat("----Qcand----",Qcand,"\n")
-    sol.hist <-sol.hist.sauv[[Qcand]]
+    sol.hist <-sol.hist.sauv[[Qcand-Qmin+1]]
     all.J[Qcand-Qmin+1]<-sol.hist$J
 
     # arguments for complete.log.lik
@@ -131,7 +143,9 @@ modelSelection_Q <- function(data,
 
 #' Plots for model selection
 #'
-#' @param model.selec_Q Output from modelSelection_Q()
+#' Plots the Integrated Classification Likelihood (ICL) criterion, the Complete Log-Likelihood (CLL) and the ELBO (J criterion).
+#'
+#' @param model.selec_Q Output from \link[ppsbm]{modelSelection_Q}.
 #'
 #' @export
 #'
@@ -139,9 +153,10 @@ modelSelection_Q <- function(data,
 #' # load data of a synthetic graph with 50 individuals and 3 clusters
 #' n <- 50
 #'
-#' # compute data matrix with precision d_max=3
-#' Dmax <- 2^3
-#' data <- list(Nijk=statistics(generated_Q3$data,n,Dmax,directed=FALSE),
+#' # compute data matrix of counts per subinterval with precision d_max=3 :
+#' # (ie nb of parts K=2^{d_max}=8).
+#' K <- 2^3
+#' data <- list(Nijk=statistics(generated_Q3$data,n,K,directed=FALSE),
 #'     Time=generated_Q3$data$Time)
 #'
 #' # ICL-model selection
@@ -157,9 +172,9 @@ modelSelec_QPlot <- function(model.selec_Q){
   par(mfrow=c(1,2))
   ymin <- min(model.selec_Q$all.compl.log.likelihood,model.selec_Q$all.ICL)
   ymax <- max(model.selec_Q$all.compl.log.likelihood,model.selec_Q$all.ICL)
-  plot(Qmin:Qmax,model.selec_Q$all.compl.log.likelihood,type='l',col='blue',xlab=paste('Qbest =',model.selec_Q$Qbest),ylab='ICL (red), complete likelihood (blue)',ylim=c(ymin,ymax))
+  plot(Qmin:Qmax,model.selec_Q$all.compl.log.likelihood,type='l',col='blue',xlab=paste('Qbest =',model.selec_Q$Qbest),ylab='ICL (red), CLL (blue)',ylim=c(ymin,ymax))
   lines(Qmin:Qmax,model.selec_Q$all.ICL,col='red')
-  plot(Qmin:Qmax,model.selec_Q$all.J,ylab='J criterion',type='l',xlab='Q')
+  plot(Qmin:Qmax,model.selec_Q$all.J,ylab='ELBO (J criterion)',type='l',xlab='Q')
   return()
 }
 
@@ -168,29 +183,31 @@ modelSelec_QPlot <- function(model.selec_Q){
 ##  Bootstrap and Confidence Interval
 #######################################
 
-#' Bootstrap and Confidence Interval
+#' Bootstrap and Confidence Bands
 #'
-#' Not for sparse models and only for histograms
+#' Plots confidence bands for estimated intensities between pairs of groups obtained by bootstrap.
 #'
-#' @param sol sol
-#' @param Time time
-#' @param R Number of bootstrap samples
-#' @param alpha Level of confidence : \eqn{1- \alpha}
-#' @param nbcores Number of cores for parallel execution
+#' Not for sparse models and only for histogram method.
 #'
-#' If set to 1 it does sequential execution
+#' @param sol One list (for one value of \eqn{Q}) output by \link[ppsbm]{mainVEM} with \code{hist} method.
+#' @param Time Positive real number. [0,Time] is the total time interval of observation.
+#' @param R Number of bootstrap samples.
+#' @param alpha Level of confidence: \eqn{1- \alpha}.
+#' @param nbcores Number of cores for parallel execution.
 #'
-#' Beware: parallelization with fork (multicore) : doesn't work on Windows!
-#' @param d_part Maximal level for finest partitions of time interval [0,T], used for kmeans initializations.
+#' If set to 1 it does sequential execution.
+#'
+#' Beware: parallelization with fork (multicore): doesn't work on Windows!
+#' @param d_part Maximal level for finest partitions of time interval [0,T], used for kmeans initializations on the bootstrap samples
 #'   \itemize{
 #'     \item Algorithm takes partition up to depth \eqn{2^d} with \eqn{d=1,...,d_{part}}
 #'     \item Explore partitions \eqn{[0,T], [0,T/2], [T/2,T], ... [0,T/2^d], ...[(2^d-1)T/2^d,T]}
 #'     \item Total number of partitions \eqn{npart= 2^{(d_{part} +1)} - 1}
 #'   }
-#' @param n_perturb Number of different perturbations on k-means result
-#' @param perc_perturb Percentage of labels that are to be perturbed (= randomly switched)
-#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
-#' @param filename filename
+#' @param n_perturb Number of different perturbations on k-means result on the bootstrap samples.
+#' @param perc_perturb Percentage of labels that are to be perturbed (= randomly switched)  on the bootstrap samples.
+#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case.
+#' @param filename Name of the file where to save the results.
 #'
 #' @export
 #'
@@ -205,11 +222,11 @@ modelSelec_QPlot <- function(model.selec_Q){
 #' data <- generated_Q3$data
 #' z <- generated_Q3$z
 #'
-#' Dmax <- 2^3
+#' K <- 2^3
 #'
-#' # VEM-algo hist
-#' sol.hist <- mainVEM(list(Nijk=statistics(data,n,Dmax,directed=FALSE),Time=Time),
-#'      n,Qmin=3,directed=FALSE,method='hist',d_part=1,n_perturb=0)[[1]]
+#' # VEM-algo hist:
+#' sol.hist <- mainVEM(list(Nijk=statistics(data,n,K,directed=FALSE),Time=Time),
+#' n,Qmin=3,directed=FALSE,method='hist',d_part=1,n_perturb=0)[[1]]
 #'
 #' # compute bootstrap confidence bands
 #' boot <- bootstrap_and_CI(sol.hist,Time,R=10,alpha=0.1,nbcores=1,d_part=1,n_perturb=0,
@@ -217,19 +234,19 @@ modelSelec_QPlot <- function(model.selec_Q){
 #'
 #' # plot confidence bands
 #' alpha.hat <- exp(sol.hist$logintensities.ql)
-#' vec.x <- (0:Dmax)*Time/Dmax
+#' vec.x <- (0:K)*Time/K
 #' ind.ql <- 0
 #' par(mfrow=c(2,3))
 #' for (q in 1:Q){
 #'   for (l in q:Q){
 #'     ind.ql <- ind.ql+1
 #'     ymax <- max(c(boot$CI.limits[ind.ql,2,],alpha.hat[ind.ql,]))
-#'     plot(vec.x,c(alpha.hat[ind.ql,],alpha.hat[ind.ql,Dmax]),type='s',col='black',
+#'     plot(vec.x,c(alpha.hat[ind.ql,],alpha.hat[ind.ql,K]),type='s',col='black',
 #'         ylab='Intensity',xaxt='n',xlab= paste('(',q,',',l,')',sep=""),
 #'         cex.axis=1.5,cex.lab=1.5,ylim=c(0,ymax),main='Confidence bands')
-#'     lines(vec.x,c(boot$CI.limits[ind.ql,1,],boot$CI.limits[ind.ql,1,Dmax]),col='blue',
+#'     lines(vec.x,c(boot$CI.limits[ind.ql,1,],boot$CI.limits[ind.ql,1,K]),col='blue',
 #'         type='s',lty=3)
-#'     lines(vec.x,c(boot$CI.limits[ind.ql,2,],boot$CI.limits[ind.ql,2,Dmax]),col='blue',
+#'     lines(vec.x,c(boot$CI.limits[ind.ql,2,],boot$CI.limits[ind.ql,2,K]),col='blue',
 #'         type='s',lty=3)
 #'   }
 #' }
@@ -262,7 +279,6 @@ bootstrap_and_CI <- function(sol,Time,R,alpha=0.05,nbcores=1,d_part=5,n_perturb=
 
 
 
-
 #' Confidence Interval
 #'
 #' Compute confidence bands for all pair of groups \eqn{(q,l)}
@@ -270,33 +286,35 @@ bootstrap_and_CI <- function(sol,Time,R,alpha=0.05,nbcores=1,d_part=5,n_perturb=
 #' @param boot.sol Bootstrap list of estimators
 #' @param alpha Level of confidence : 1 - \eqn{\alpha}
 #'
-#' @export
+#' @keywords internal
 #'
-#' @examples
+#' @return Array with 3 dimensions and size \eqn{Q(Q+1)/2\times 3\times K} (if undirected) or \eqn{Q^2\times 3\times K} (when undirected)
+#' containing for each pair of groups \eqn{(q,l)} (first dimension) and each \eqn{k}-th subinterval (third dimension) the 3 quantiles at levels \eqn{(\alpha/2,1-\alpha/2,.5)} (second dimension).
 #'
-#' # data of a synthetic graph with 50 individuals and 3 clusters
-#'
-#' n <- 50
-#' Q <- 3
-#'
-#' Time <- generated_Q3$data$Time
-#' data <- generated_Q3$data
-#' z <- generated_Q3$z
-#'
-#' Dmax <- 2^3
-#'
-#' # VEM-algo hist
-#' sol.hist <- mainVEM(list(Nijk=statistics(data,n,Dmax,directed=FALSE),Time=Time),
-#'      n,Qmin=3,directed=FALSE,method='hist',d_part=1,n_perturb=0)[[1]]
-#'
-#' # compute bootstrap confidence bands
-#' boot <- bootstrap_and_CI(sol.hist,Time,R=5,alpha=0.1,nbcores=1,d_part=1,n_perturb=0,
-#'      directed=FALSE)
-#'
-#' boot.sol <- boot$boot.sol
-#'
-#' confidenceInterval(boot.sol)
-#'
+# # Example
+# # data of a synthetic graph with 50 individuals and 3 clusters
+#
+# n <- 50
+# Q <- 3
+#
+# Time <- generated_Q3$data$Time
+# data <- generated_Q3$data
+# z <- generated_Q3$z
+#
+# K <- 2^3
+#
+# # VEM-algo hist
+# sol.hist <- mainVEM(list(Nijk=statistics(data,n,K,directed=FALSE),Time=Time),
+#     n,Qmin=3,directed=FALSE,method='hist',d_part=1,n_perturb=0)[[1]]
+#
+# # compute bootstrap confidence bands
+# boot <- bootstrap_and_CI(sol.hist,Time,R=5,alpha=0.1,nbcores=1,d_part=1,n_perturb=0,
+#      directed=FALSE)
+#
+# boot.sol <- boot$boot.sol
+#
+# confidenceInterval(boot.sol)
+#
 confidenceInterval <- function(boot.sol,alpha=0.05){
   dim.sol <- dim(boot.sol)
   R <- dim.sol[1]
@@ -315,31 +333,31 @@ confidenceInterval <- function(boot.sol,alpha=0.05){
 
 #' Direct kernel estimator intensities
 #'
-#' Compute smooth intensities with direct kernel estimation of intensities relying on a classification tau.
-#' This can be used with the values \eqn{\tau} obtained on a dataset with mainVEM function run with 'hist' method.
+#' Compute smooth intensities with direct kernel estimation of intensities relying on a classification \eqn{\tau}.
+#' This can be used with the values \eqn{\tau} obtained on a dataset with \link[ppsbm]{mainVEM} function.
 #'
-#' Warning : sparse case not implemented !!!
+#' Warning: sparse case not implemented !!!
 #'
 #' @param data List with 3 components:
 #'   \itemize{
-#'     \item data$time.seq : sequence of observed time points of the m-th event (M-vector)
-#'     \item data$type.seq : sequence of observed values convertNodePair(i,j,n,directed) (auxiliary.R)
-#'         of process that produced the mth event (M-vector)
-#'     \item $Time - [0,data$Time] is the total time interval of observation
+#'     \item \code{time.seq} - Vector of observed time points of the events (length \eqn{M}).
+#'     \item \code{type.seq} - Vector of observed types of node pairs (as encoded through \link[ppsbm]{convertNodePair} of the events (length \eqn{M})).
+#'     \item \code{Time} - [0,Time] is the total time interval of observation.
 #'   }
-#' @param tau \eqn{\tau}
-#' @param Q Total number of groups
-#' @param n Total number of nodes
+#' @param tau Matrix with size \eqn{Q\times n} and values in \eqn{(0,1)}, containing the (estimated) probability that cluster \eqn{q} contains node \eqn{i}.
+#' @param Q Total number of groups.
+#' @param n Total number of nodes,  \eqn{1\le i \le n}.
 #' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
-#' @param rho \eqn{\rho}
-#' @param sparse Boolean for sparse (TRUE) or not sparse (FALSE) case
-#' @param nb.points Number of points
+#' @param rho Either 1 (non sparse case) or vector with length \eqn{Q(Q+1)/2} (undirected case) or \eqn{Q^2} (directed case) with (estimated) values for the sparsity parameters \eqn{\rho^{(q,l)}}. See Section S6 in the supplementary material paper of Matias et al. (Biometrika, 2018) for more details.
+#' @param sparse Boolean for sparse (TRUE) or not sparse (FALSE) case.
+#' @param nb.points Number of points for the kernel estimation.
 #'
 #' @export
 #'
 #' @examples
 #'
-#' # The generated_sol_kernel was generated calling mainVEM with kernel method on the generated_Q3 data
+#' # The generated_sol_kernel solution was generated calling mainVEM
+#' # with kernel method on the generated_Q3$data dataset.
 #' # (50 individuals and 3 clusters)
 #'
 #' data <- generated_Q3$data
@@ -348,10 +366,10 @@ confidenceInterval <- function(boot.sol,alpha=0.05){
 #' Q <- 3
 #'
 #'
-#' # compute smooth intensity estimators
+#' # Compute smooth intensity estimators
 #' sol.kernel.intensities <- kernelIntensities(data,generated_sol_kernel$tau,Q,n,directed=FALSE)
 #'
-kernelIntensities <- function(data,tau,Q,n,directed,rho=1,sparse=FALSE,nb.points=1000){
+kernelIntensities <- function(data,tau,Q,n,directed,rho=1,sparse=FALSE,nb.points=1000*data$Time){
   N <- if (directed) n*(n-1) else n*(n-1)/2
   N_Q <- if (directed) Q^2 else Q*(Q+1)/2
 
@@ -446,8 +464,11 @@ kernelIntensities <- function(data,tau,Q,n,directed,rho=1,sparse=FALSE,nb.points
 #'
 #' Compute the Adjusted Rand Index (ARI) between the true latent variables and the estimated latent variables
 #'
-#' @param z Matrix of size  \eqn{Q \times n} with entries = 0 or 1 : 'true' latent variables
-#' @param hat.z Matrix of \eqn{Q \times n}  with 0<entries<1 : estimated latent variables
+#' @param z Matrix of size  \eqn{Q \times n} with entries = 0 or 1: 'true' latent variables
+#' @param hat.z Matrix of \eqn{Q \times n}  with 0<entries<1: estimated latent variables
+#'
+#' @references
+#' HUBERT, L. & ARABIE, P. (1985). Comparing partitions. J. Classif. 2, 193–218.
 #'
 #' @export
 #'
@@ -487,27 +508,26 @@ ARI <- function(z, hat.z){
 #' Optimal matching between 2 clusterings
 #'
 #' Compute the permutation of the rows of hat.z that has to be applied to obtain the "same order" as z.
-#' Compute optimal matching between 2 clusterings using Hungarian algorithm
+#' Compute optimal matching between 2 clusterings using Hungarian algorithm.
 #'
 #'
-#' @param z Matrice of size  \eqn{Q \times n}
-#' @param hat.z Matrice of size  \eqn{Q \times n}
+#' @param z Matrix of size  \eqn{Q \times n}
+#' @param hat.z Matrix of size  \eqn{Q \times n}
 #'
-#' @export
+#' @keywords internal
 #'
 #' @references
 #'
 #' HUBERT, L. & ARABIE, P. (1985). Comparing partitions. J. Classif. 2, 193–218.
 #'
-#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 #'
-#' @examples
-#'
-#' z <- matrix(c(1,1,0,0,0,0, 0,0,1,1,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
-#' hat.z <- matrix(c(0,0,1,1,0,0, 1,1,0,0,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
-#'
-#' perm <- permuteZEst(z,hat.z)
-#'
+# # Example
+# z <- matrix(c(1,1,0,0,0,0, 0,0,1,1,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
+# hat.z <- matrix(c(0,0,1,1,0,0, 1,1,0,0,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
+#
+# perm <- permuteZEst(z,hat.z)
+#
 permuteZEst <- function(z,hat.z){
   map.z <- colMaxs(z, FALSE) # apply(z,2,which.max)
   map.hatz <- colMaxs(hat.z, FALSE) # apply(hat.z,2,which.max)
@@ -521,12 +541,12 @@ permuteZEst <- function(z,hat.z){
 
 #' Sort intensities
 #'
-#' Sort intensities associated with hat.z "in the same way" as the original intensities associated with z by permutation of rows
+#' Sort intensities associated with the estimated clustering \eqn{\hat z} "in the same way" as the original intensities associated with true clustering \eqn{z} by permutation of rows.
 #'
-#' @param intensities Intensities \eqn{\alpha}
-#' @param z Matrice of size  \eqn{Q \times n}
-#' @param hat.z Matrice of size  \eqn{Q \times n}
-#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case
+#' @param intensities Matrix whose rows contain piecewise constant intensities \eqn{\alpha^{(q,l)}}, given as a vector of values on a regular partition of the time interval.
+#' @param z Matrix of size  \eqn{Q \times n}.
+#' @param hat.z Matrix of size  \eqn{Q \times n}.
+#' @param directed Boolean for directed (TRUE) or undirected (FALSE) case.
 #'
 #' @export
 #'
@@ -534,15 +554,17 @@ permuteZEst <- function(z,hat.z){
 #'
 #' HUBERT, L. & ARABIE, P. (1985). Comparing partitions. J. Classif. 2, 193–218.
 #'
-#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+#' MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 #'
 #' @examples
-#'
+#' # True and estimated clusters for n=6 nodes clustered into Q=3 groups
 #' z <- matrix(c(1,1,0,0,0,0, 0,0,1,1,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
 #' hat.z <- matrix(c(0,0,1,1,0,0, 1,1,0,0,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
 #'
+#' # Set constant intensities for each directed pair (q,l)
 #' intens <- matrix(c(1,1,1,2,2,2,3,3,3),9)
 #'
+#' # Permute the rows according to the permutation that "matches" hat.z with z
 #' sortIntensities(intens,z,hat.z, TRUE)
 #'
 sortIntensities <- function(intensities,z,hat.z,directed){
@@ -559,6 +581,3 @@ sortIntensities <- function(intensities,z,hat.z,directed){
   }
   return(sol)
 }
-
-
-

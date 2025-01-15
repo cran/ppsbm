@@ -19,25 +19,25 @@ convertGroupPair(q, l, Q, directed = TRUE)
 Index corresponding to the group pair \eqn{(q,l)}
 }
 \description{
-Gives the index in \eqn{1, \ldots, Q^2} (directed) or \eqn{1, \ldots, Q*(Q+1)/2} (undirected) that corresponds to group pair \eqn{(q,l)}. Works also for vectors of indices \eqn{q} and \eqn{l}.
+Gives the index in \eqn{1, \ldots, Q^2} (directed) or \eqn{1, \ldots, Q(Q+1)/2} (undirected) that corresponds to group pair \eqn{(q,l)}. Works also for vectors of indices \eqn{q} and \eqn{l}.
 }
 \details{
 Relations between groups \eqn{(q,l)} are stored in vectors, whose indexes depend on whether the graph is directed or undirected.
 \describe{
   \item{\strong{Directed case :}}{
     \itemize{
-      \item The \eqn{(q,l)} group pair is converted into the index \eqn{(q-1)*Q+l}
+      \item The \eqn{(q,l)} group pair is converted into the index \eqn{(q-1)Q+l}
     }
   }
   \item{\strong{Undirected case :}}{
     \itemize{
-      \item The \eqn{(q,l)} group pair with \eqn{q<=l} is converted into the index \eqn{(2*Q-q+2)*(q-1)/2 +l-q+1}
+      \item The \eqn{(q,l)} group pair with \eqn{q\leq l} is converted into the index \eqn{(2Q-q+2)*(q-1)/2 +l-q+1}
     }
   }
 }
 }
 \examples{
-# Convert the group pair (3,2) into an index, where the total number of group is 3,
+# Convert the group pair (3,2) into an index, where the total number of groups is 3,
 # for directed and undirected graph
 
 q <- 3

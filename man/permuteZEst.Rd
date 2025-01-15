@@ -7,24 +7,17 @@
 permuteZEst(z, hat.z)
 }
 \arguments{
-\item{z}{Matrice of size  \eqn{Q \times n}}
+\item{z}{Matrix of size  \eqn{Q \times n}}
 
-\item{hat.z}{Matrice of size  \eqn{Q \times n}}
+\item{hat.z}{Matrix of size  \eqn{Q \times n}}
 }
 \description{
 Compute the permutation of the rows of hat.z that has to be applied to obtain the "same order" as z.
-Compute optimal matching between 2 clusterings using Hungarian algorithm
-}
-\examples{
-
-z <- matrix(c(1,1,0,0,0,0, 0,0,1,1,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
-hat.z <- matrix(c(0,0,1,1,0,0, 1,1,0,0,0,0, 0,0,0,0,1,1), nrow = 3, byrow = TRUE)
-
-perm <- permuteZEst(z,hat.z)
-
+Compute optimal matching between 2 clusterings using Hungarian algorithm.
 }
 \references{
 HUBERT, L. & ARABIE, P. (1985). Comparing partitions. J. Classif. 2, 193–218.
 
-MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 }
+\keyword{internal}

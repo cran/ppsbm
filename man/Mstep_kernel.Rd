@@ -19,7 +19,8 @@ M step for kernel estimator
 \references{
 GRÉGOIRE , G. (1993). Least squares cross-validation for counting process intensities. Scand. J. Statist. 20, pp. 343–360.
 
-MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika.
+MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 
 RAMLAU-HANSEN, H. (1983). Smoothing counting process intensities by means of kernel functions. Ann. Statist. 11, pp. 453–466.
 }
+\keyword{internal}

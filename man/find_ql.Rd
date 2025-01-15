@@ -17,13 +17,13 @@ find_ql(ind_ql, Q, directed = TRUE)
 Group pair \eqn{(q,l)} corresponding to the given index
 }
 \description{
-This function is the inverse of the conversion \eqn{{(q,l), q,l} } into \eqn{{1,...,Q^2}} for the directed case \eqn{{(q,l), q<= l}} into \eqn{{1,...,Q*(Q+1)/2}} for the undirected case.
-It takes the integer index corresponding to \eqn{(q,l)} and returns \eqn{(q,l)}.
+This function is the inverse of the conversion \eqn{\{(q,l), 1 \le q,l\le Q \} } into \eqn{\{1,...,Q^2\}} for the directed case and of \eqn{\{(q,l), 1 \le q \le  l \le Q \}} into \eqn{\{1,...,Q(Q+1)/2\}} for the undirected case.
+It takes the integer index corresponding to \eqn{(q,l)} and returns the pair \eqn{(q,l)}.
 }
 \examples{
 # Convert the index 5 into a group pair for undirected graph
 # and the index 8 into a group pair for directed graph
-# where the total number of group is 3
+# where the total number of groups is 3
 
 ind_ql_dir <- 8
 ind_ql_undir <- 5

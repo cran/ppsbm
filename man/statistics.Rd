@@ -7,26 +7,26 @@
 statistics(data, n, K, directed = TRUE)
 }
 \arguments{
-\item{data}{List with $type.seq, $time.seq}
+\item{data}{List with 3 components \code{$type.seq, $time.seq, $Time} (see \link[ppsbm]{mainVEM} for more details).}
 
-\item{n}{Total number of nodes : \eqn{i,j\in {1, \ldots, n} }}
+\item{n}{Total number of nodes,  \eqn{1\le i \le n}.}
 
-\item{K}{Size of the regular partition, i.e. number of subintervals}
+\item{K}{Size of the regular partition, i.e. number of subintervals of the time interval. When used as input in the VEM algorithm (with \code{hist} method), \eqn{K} must be a power of 2.}
 
-\item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case}
+\item{directed}{Boolean for directed (TRUE) or undirected (FALSE) case.}
 }
 \value{
-N(i,j)k = number of events for the node (i,j) during the k-th subinterval
+N[(i,j),k] = matrix with \eqn{K} columns, each row contains the number of events for the node pair \eqn{(i,j)} during the k-th subinterval
 }
 \description{
-Convert the initial data into the statistics matrix \eqn{N_{ijk}}, by counting the number of events for the nodes during the subintervals of a particular partition of the time interval.
+Convert the initial data into the statistics matrix \eqn{N_{(ij),k}}, by counting the number of events for the nodes pair types \eqn{(i,j)} during the \eqn{k}-th subinterval of a regular partition (in \eqn{K} parts) of the time interval.
 }
 \examples{
-# Convert the generated data into the statistics matrix N_ijk with 8 columns
+# Convert the generated data into the statistics matrix N_ijk with 8 subintervals
 
 n <- 50
-Dmax <- 2^3
+K <- 2^3
 
-obs <- statistics(generated_Q3$data,n,Dmax,directed=FALSE)
+obs <- statistics(generated_Q3$data,n,K,directed=FALSE)
 
 }

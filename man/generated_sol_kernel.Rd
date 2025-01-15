@@ -3,15 +3,30 @@
 \docType{data}
 \name{generated_sol_kernel}
 \alias{generated_sol_kernel}
-\title{Generated solution with kernel method}
-\format{Solution containing
+\title{Output example of \link[ppsbm]{mainVEM}}
+\format{
+Solution for Q=5 clusters, containing 5 components:
 \describe{
-  \item{List of 8}{tau, logintensities.ql.ij, J, run, converged}
-}}
+ \item{\code{tau}}{Matrix with size \eqn{Q\times n} containing the estimated probability in \eqn{(0,1)} that cluster \eqn{q} contains node \eqn{i}.}
+ \item{\code{J}}{Estimated value of the ELBO}
+ \item{\code{run}}{Which run of the algorithm gave the best solution. A run relies on a specific initialization of the algorithm. A negative value maybe obtained in the decreasing phase (for Q) of the algorithm.}  
+ \item{\code{converged}}{Boolean. If TRUE, the algorithm stopped at convergence. Otherwise it stopped at the maximal number of iterations.} 
+}
+}
 \usage{
 generated_sol_kernel
 }
 \description{
-Generated solution with kernel method
+Output of \link[ppsbm]{mainVEM} obtained on dataset \code{generated_Q3} with \code{kernel} method and Qmin=Qmax=5.
+}
+\details{
+This solution was (randomly) obtained using the following code
+\preformatted{
+# WARNING - This is very long
+generated_sol_kernel <- mainVEM(generated_Q3$data,n=50,Qmin=5,directed=FALSE,method='kernel')[[1]]
+}
+}
+\references{
+MATIAS, C., REBAFKA, T. & VILLERS, F. (2018).  A semiparametric extension of the stochastic block model for longitudinal networks. Biometrika. 105(3): 665-680.
 }
 \keyword{datasets}

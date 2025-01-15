@@ -26,3 +26,4 @@ VEstep(VE, mstep, directed, sparse, method, epsilon, fix.iter, data)
 \description{
 VE step
 }
+\keyword{internal}
